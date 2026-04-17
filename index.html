@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🩺 국시 공부 플랜 5A조</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3248;--accent:#4f8ef7;--accent2:#7c6af7;--green:#3ecf8e;--yellow:#f5c542;--red:#f25f5c;--rest:#555870;--text:#e8eaf6;--text2:#8b90b0;--text3:#555870;--r:14px;--rs:8px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:50px;}
+.hdr{background:linear-gradient(135deg,#1a1d27,#16192b);border-bottom:1px solid var(--border);padding:16px 16px 12px;position:sticky;top:0;z-index:100;}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.hdr h1{font-size:16px;font-weight:700;}
+.hdr h1 span{color:var(--accent);}
+.dday{font-family:'DM Mono',monospace;font-size:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:600;}
+.today-strip{background:var(--surface2);border-radius:var(--rs);padding:9px 13px;display:flex;align-items:center;gap:10px;border:1px solid var(--border);}
+.t-label{font-size:10px;color:var(--text3);white-space:nowrap;}
+.t-subj{font-size:12px;color:var(--text);font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.t-count{font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);white-space:nowrap;}
+.cal-wrap{padding:14px 10px 0;}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px;}
+.cal-nav button{background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:8px;width:32px;height:32px;font-size:16px;cursor:pointer;transition:.15s;}
+.cal-nav button:hover{background:var(--border);color:var(--text);}
+.cal-month{font-size:15px;font-weight:700;}
+.cal-month span{color:var(--accent);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-dow{text-align:center;font-size:10px;color:var(--text3);font-weight:500;padding:3px 0 5px;font-family:'DM Mono',monospace;}
+.cal-dow:first-child{color:#f25f5c66;}
+.cal-dow:last-child{color:#4f8ef766;}
+.cal-day{aspect-ratio:1;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:.15s;border:1.5px solid transparent;background:var(--surface);overflow:hidden;min-height:42px;}
+.cal-day:hover:not(.empty){border-color:var(--accent);transform:scale(1.05);}
+.cal-day.empty{background:transparent;cursor:default;pointer-events:none;}
+.cal-day.today{border-color:var(--accent)!important;background:#1e2540;}
+.cal-day.selected{border-color:var(--accent2)!important;background:#221e40;}
+.cal-day.past .dn{color:var(--text3);}
+.cal-day.day-rest{background:#191c26;}
+.dn{font-size:12px;font-weight:600;font-family:'DM Mono',monospace;line-height:1;}
+.sun .dn{color:#f25f5c88;}
+.sat .dn{color:#4f8ef788;}
+.cal-day.today .dn{color:var(--accent)!important;}
+.dot-row{display:flex;gap:2px;margin-top:3px;}
+.dot{width:5px;height:5px;border-radius:50%;}
+.dot-s{background:var(--accent);}
+.dot-d{background:var(--green);}
+.dot-r{background:var(--rest);}
+.dot-e{background:var(--red);}
+.dot-v{background:var(--yellow);}
+.day-bar{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--border);}
+.day-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--accent));transition:width .3s;}
+.detail{margin:12px 10px 0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.d-hdr{padding:12px 14px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.d-date{font-size:14px;font-weight:700;}
+.d-rot{font-size:10px;color:var(--text3);background:var(--bg);border-radius:5px;padding:3px 7px;}
+.d-rot.golden{color:var(--green);background:#0d2a1e;}
+.d-rot.warn{color:var(--yellow);background:#2a220d;}
+.d-rot.rest-r{color:var(--rest);background:#1a1d27;}
+.d-rot.exam-r{color:var(--red);background:#2a0d0d;}
+.d-body{padding:14px;}
+.rest-msg{text-align:center;padding:18px 10px;color:var(--text3);font-size:13px;}
+.rest-msg .em{font-size:30px;display:block;margin-bottom:8px;}
+.day-summary{margin-bottom:12px;}
+.day-summary-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.day-summary-label{font-size:11px;color:var(--text3);}
+.day-summary-pct{font-family:'DM Mono',monospace;font-size:14px;font-weight:600;}
+.bar-wrap{background:var(--surface2);border-radius:99px;height:7px;overflow:hidden;margin-bottom:5px;}
+.bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent2),var(--accent),var(--green));transition:width .3s;}
+.day-summary-nums{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);}
+.subj-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.subj-row:last-child{border-bottom:none;}
+.s-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);background:var(--bg);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.15s;font-size:12px;}
+.s-check.on{background:var(--green);border-color:var(--green);}
+.s-info{flex:1;min-width:0;}
+.s-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.s-target{font-size:10px;color:var(--text3);margin-top:2px;}
+.s-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+.s-input{width:62px;height:30px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;text-align:center;outline:none;transition:.15s;}
+.s-input:focus{border-color:var(--accent);}
+.s-pct{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);}
+.overall{margin:12px 10px 0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px;}
+.overall-title{font-size:11px;color:var(--text3);margin-bottom:9px;font-weight:500;letter-spacing:.5px;}
+.overall-nums{display:flex;justify-content:space-between;margin-top:5px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);}
+.overall-nums strong{color:var(--green);}
+.legend{display:flex;gap:10px;flex-wrap:wrap;padding:10px 10px 0;}
+.leg{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);}
+.leg-dot{width:7px;height:7px;border-radius:50%;}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-top">
+    <h1>🩺 국시 공부 플랜 <span>5A조</span></h1>
+    <div class="dday" id="ddayEl">D-???</div>
+  </div>
+  <div class="today-strip">
+    <div class="t-label">오늘</div>
+    <div class="t-subj" id="todaySubj">—</div>
+    <div class="t-count" id="todayCount"></div>
+  </div>
+</div>
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:var(--accent)"></div>공부</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--yellow)"></div>오답</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--rest)"></div>패스</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--red)"></div>시험</div>
+</div>
+<div class="cal-wrap">
+  <div class="cal-nav">
+    <button id="prevBtn">&#8249;</button>
+    <div class="cal-month" id="calMonth"></div>
+    <button id="nextBtn">&#8250;</button>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+</div>
+<div class="detail" id="detailPanel" style="display:none"></div>
+<div class="overall">
+  <div class="overall-title">&#9654; 전체 1독 달성률</div>
+  <div class="bar-wrap"><div class="bar-fill" id="overallBar" style="width:0%"></div></div>
+  <div class="overall-nums">
+    <span id="overallDone">0문항 완료</span>
+    <span>전체 <strong id="overallPct">0%</strong></span>
+  </div>
+</div>
+<script>
+var PLAN={};
+var EXAM=new Date('2026-11-27T00:00:00');
+function fmtKey(d){var y=d.getFullYear();var m=String(d.getMonth()+1).padStart(2,'0');var dd=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+dd;}
+function buildDays(start,end,rotation,mainQ,exQ){
+  var mq=mainQ.map(function(s){return Object.assign({},s);});
+  var eq=exQ.map(function(s){return Object.assign({},s);});
+  var d=new Date(start+'T00:00:00');var e=new Date(end+'T00:00:00');
+  while(d<=e){
+    var key=fmtKey(d);var isWk=(d.getDay()===0||d.getDay()===6);
+    var mi=mq.find(function(s){return s.rem>0;})||mq[mq.length-1];
+    var ei=eq.find(function(s){return s.rem>0;})||null;
+    var mt=isWk?(mi.we||mi.wd):mi.wd;var et=ei?(isWk?(ei.we||ei.wd):ei.wd):0;
+    mi.rem-=mt;if(ei)ei.rem-=et;
+    var subs=[{name:mi.name,target:mt}];
+    if(ei&&et>0)subs.push({name:ei.name+' (내과)',target:et});
+    PLAN[key]={rotation:rotation,subjects:subs,type:'study',total:mt+et};
+    d.setDate(d.getDate()+1);
+  }
+}
+function addRest(start,end,rotation,label){
+  var d=new Date(start+'T00:00:00');var e=new Date(end+'T00:00:00');
+  while(d<=e){PLAN[fmtKey(d)]={rotation:rotation,subjects:[{name:label,target:0}],type:'rest',total:0};d.setDate(d.getDate()+1);}
+}
+function addReview(start,end,rotation,label){
+  var d=new Date(start+'T00:00:00');var e=new Date(end+'T00:00:00');
+  while(d<=e){var isWk=(d.getDay()===0||d.getDay()===6);var t=isWk?25:15;PLAN[fmtKey(d)]={rotation:rotation,subjects:[{name:label,target:t}],type:'review',total:t};d.setDate(d.getDate()+1);}
+}
+
+// 산부인과 4/17~5/3 (4/6~4/16 지남, 분량 재분배)
+buildDays('2026-04-17','2026-05-03','산부인과',
+  [{name:'부인과',rem:114,wd:24,we:36},{name:'산과',rem:174,wd:24,we:36}],
+  [{name:'소화기',rem:254,wd:35,we:55},{name:'호흡기',rem:198,wd:35,we:55},{name:'순환기',rem:211,wd:35,we:55}]);
+// 소아청소년과
+buildDays('2026-05-04','2026-05-31','소아청소년과',
+  [{name:'소아청소년과총론',rem:194,wd:25,we:40},{name:'소아청소년과각론',rem:274,wd:25,we:40},{name:'마이너',rem:130,wd:25,we:40}],
+  [{name:'신장',rem:178,wd:15,we:25},{name:'내분비',rem:152,wd:15,we:25},{name:'혈액',rem:120,wd:15,we:25}]);
+// 정신건강의학과
+buildDays('2026-06-01','2026-06-28','정신건강의학과',
+  [{name:'정신건강의학과',rem:123,wd:6,we:12},{name:'CC 정신',rem:42,wd:6,we:12}],
+  [{name:'감염',rem:124,wd:14,we:25},{name:'류마티스',rem:100,wd:14,we:25},{name:'알레르기',rem:78,wd:14,we:25}]);
+// 인천지역
+buildDays('2026-06-29','2026-07-12','인천지역 🔥',
+  [{name:'외과총론',rem:176,wd:40,we:60},{name:'외과각론',rem:346,wd:40,we:60}],[]);
+// 신경과 패스
+addRest('2026-07-13','2026-07-26','신경과 ⚠️','😴 공부 패스 — 충전!');
+// 소화기실습
+buildDays('2026-07-27','2026-08-16','소화기실습',
+  [{name:'외과각론(계속)',rem:200,wd:20,we:35},{name:'종양',rem:120,wd:20,we:35}],[]);
+// 종양/방사선 패스
+addRest('2026-08-17','2026-08-23','종양/방사선 ⚠️','😴 공부 패스 — 충전!');
+// 강릉지역사회
+buildDays('2026-08-24','2026-09-20','강릉지역사회 🔥',
+  [{name:'ACM 25-1',rem:200,wd:40,we:60},{name:'ACM 25-2',rem:200,wd:40,we:60},{name:'R-type 모음',rem:141,wd:40,we:60},{name:'멀티미디어 문항 모음집',rem:84,wd:40,we:60}],[]);
+// 오답 2독
+addReview('2026-09-21','2026-10-04','호흡기실습','산부인과 + 소아과 오답');
+addReview('2026-10-05','2026-10-18','심장실습','정신건강 + 내과 오답');
+addReview('2026-10-19','2026-11-01','신장실습','내과 오답 + 의료법규·예방의학');
+addReview('2026-11-02','2026-11-15','외과 I~II','외과 + ACM 오답');
+addReview('2026-11-16','2026-11-26','외과 III + 평가','취약과목 집중 + 전과목 오답 마무리');
+PLAN['2026-11-27']={rotation:'🎯 D-DAY',subjects:[{name:'국가고시 시험일!!',target:0}],type:'exam',total:0};
+
+var SK='guksi_v2';var prog={};
+try{prog=JSON.parse(localStorage.getItem(SK)||'{}');}catch(e){}
+function getProg(key,name){return(prog[key]&&prog[key][name])||0;}
+function setProg(key,name,val){if(!prog[key])prog[key]={};prog[key][name]=val;try{localStorage.setItem(SK,JSON.stringify(prog));}catch(e){}}
+
+var todayD=new Date();todayD.setHours(0,0,0,0);
+var todayKey=fmtKey(todayD);
+var planStart=new Date('2026-04-17T00:00:00');
+var planEnd=new Date('2026-11-27T00:00:00');
+var curYear=(todayD>=planStart&&todayD<=planEnd)?todayD.getFullYear():2026;
+var curMonth=(todayD>=planStart&&todayD<=planEnd)?todayD.getMonth():3;
+var selKey=(todayD>=planStart&&todayD<=planEnd)?todayKey:'2026-04-17';
+
+(function(){var diff=Math.ceil((EXAM-todayD)/(1000*60*60*24));document.getElementById('ddayEl').textContent=diff>0?'D-'+diff:diff===0?'D-DAY':'완료 🎉';})();
+(function(){var p=PLAN[todayKey];if(!p){document.getElementById('todaySubj').textContent='일정없음';return;}if(p.type==='rest'){document.getElementById('todaySubj').textContent='😴 공부 패스!';return;}var names=p.subjects.map(function(s){return s.name.replace(' (내과)','');}).join(' + ');var total=p.subjects.reduce(function(a,b){return a+(b.target||0);},0);document.getElementById('todaySubj').textContent=names;document.getElementById('todayCount').textContent=total>0?'목표 '+total+'문항':'';})();
+
+document.getElementById('prevBtn').onclick=function(){curMonth--;if(curMonth<0){curMonth=11;curYear--;}renderCal();};
+document.getElementById('nextBtn').onclick=function(){curMonth++;if(curMonth>11){curMonth=0;curYear++;}renderCal();};
+renderCal();showDetail(selKey);updateOverall();
+
+function renderCal(){
+  var MN=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('calMonth').innerHTML='<span>'+curYear+'</span>년 '+MN[curMonth];
+  var grid=document.getElementById('calGrid');grid.innerHTML='';
+  ['일','월','화','수','목','금','토'].forEach(function(d){var el=document.createElement('div');el.className='cal-dow';el.textContent=d;grid.appendChild(el);});
+  var firstDow=new Date(curYear,curMonth,1).getDay();
+  var totalDays=new Date(curYear,curMonth+1,0).getDate();
+  for(var i=0;i<firstDow;i++){var el=document.createElement('div');el.className='cal-day empty';grid.appendChild(el);}
+  for(var day=1;day<=totalDays;day++){
+    var d=new Date(curYear,curMonth,day);var key=fmtKey(d);var p=PLAN[key];var dow=d.getDay();
+    var el=document.createElement('div');el.className='cal-day';
+    if(dow===0)el.classList.add('sun');if(dow===6)el.classList.add('sat');
+    if(d<todayD)el.classList.add('past');
+    if(key===todayKey)el.classList.add('today');
+    if(key===selKey)el.classList.add('selected');
+    if(p&&p.type==='rest')el.classList.add('day-rest');
+    var dn=document.createElement('div');dn.className='dn';dn.textContent=day;el.appendChild(dn);
+    if(p){var dr=document.createElement('div');dr.className='dot-row';var dot=document.createElement('div');dot.className='dot';
+      if(p.type==='exam')dot.classList.add('dot-e');
+      else if(p.type==='rest')dot.classList.add('dot-r');
+      else if(p.type==='review')dot.classList.add('dot-v');
+      else{var pct=getDayPct(key,p);dot.classList.add(pct>=100?'dot-d':'dot-s');}
+      dr.appendChild(dot);el.appendChild(dr);}
+    if(p&&p.total>0){var bar=document.createElement('div');bar.className='day-bar';var fill=document.createElement('div');fill.className='day-bar-fill';fill.style.width=Math.min(100,getDayPct(key,p))+'%';bar.appendChild(fill);el.appendChild(bar);}
+    (function(k){el.onclick=function(){selKey=k;renderCal();showDetail(k);};})(key);
+    grid.appendChild(el);
+  }
+}
+function getDayPct(key,p){if(!p||!p.subjects)return 0;var total=p.subjects.reduce(function(a,b){return a+(b.target||0);},0);if(!total)return 0;var done=p.subjects.reduce(function(a,b){return a+Math.min(b.target||0,getProg(key,b.name));},0);return Math.round(done/total*100);}
+function showDetail(key){
+  var panel=document.getElementById('detailPanel');panel.style.display='block';
+  var p=PLAN[key];var label=formatKo(key);
+  if(!p){panel.innerHTML='<div class="d-hdr"><div class="d-date">'+label+'</div><div class="d-rot">일정없음</div></div><div class="d-body"><div class="rest-msg"><span class="em">📅</span>계획 없는 날이에요</div></div>';return;}
+  var rotCls=p.rotation.indexOf('🔥')>=0?'golden':p.rotation.indexOf('⚠️')>=0?'warn':p.type==='rest'?'rest-r':p.type==='exam'?'exam-r':'';
+  var body='';
+  if(p.type==='rest'){body='<div class="rest-msg"><span class="em">😴</span>'+(p.subjects[0]&&p.subjects[0].name||'오늘은 쉬는 날!')+'</div>';}
+  else if(p.type==='exam'){body='<div class="rest-msg"><span class="em">🎯</span><strong style="color:var(--red);font-size:17px">국가고시 D-DAY!</strong><br><br><span style="color:var(--text2)">잘 풀고 오세요 🩺</span></div>';}
+  else{
+    var total=p.subjects.reduce(function(a,b){return a+(b.target||0);},0);
+    var done=p.subjects.reduce(function(a,b){return a+Math.min(b.target||0,getProg(key,b.name));},0);
+    var pct=total>0?Math.round(done/total*100):0;
+    var pctColor=pct>=100?'var(--green)':pct>=50?'var(--accent)':'var(--text2)';
+    var sk=key.replace(/-/g,'');
+    body+='<div class="day-summary"><div class="day-summary-top"><span class="day-summary-label">오늘 진도</span><span class="day-summary-pct" id="pt'+sk+'" style="color:'+pctColor+'">'+pct+'%</span></div><div class="bar-wrap"><div class="bar-fill" id="pb'+sk+'" style="width:'+Math.min(100,pct)+'%"></div></div><div class="day-summary-nums"><span id="pd'+sk+'">'+done+'문항 완료</span><span>목표 '+total+'문항</span></div></div>';
+    p.subjects.forEach(function(subj){
+      var sv=getProg(key,subj.name);var spct=subj.target>0?Math.round(sv/subj.target*100):0;var isDone=(sv>=subj.target&&subj.target>0);
+      var sid=(key+'_'+subj.name).replace(/[^a-zA-Z0-9가-힣]/g,'_');
+      body+='<div class="subj-row"><div class="s-check '+(isDone?'on':'')+'" onclick="toggleCheck(\''+key+'\',\''+subj.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\','+subj.target+')">'+(isDone?'✓':'')+'</div><div class="s-info"><div class="s-name">'+subj.name+'</div><div class="s-target">목표 '+subj.target+'문항</div></div><div class="s-right"><input class="s-input" type="number" min="0" max="'+(subj.target+50)+'" value="'+(sv||'')+'" placeholder="0" oninput="onInput(this,\''+key+'\',\''+subj.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\','+subj.target+')"><div class="s-pct" id="sp'+sid+'">'+spct+'%</div></div></div>';
+    });
+  }
+  panel.innerHTML='<div class="d-hdr"><div class="d-date">'+label+'</div><div class="d-rot '+rotCls+'">'+p.rotation+'</div></div><div class="d-body">'+body+'</div>';
+}
+function toggleCheck(key,name,target){var cur=getProg(key,name);setProg(key,name,cur>=target?0:target);showDetail(key);renderCal();updateOverall();}
+function onInput(input,key,name,target){
+  var val=Math.max(0,parseInt(input.value)||0);setProg(key,name,val);
+  var pct=target>0?Math.round(val/target*100):0;
+  var sid=(key+'_'+name).replace(/[^a-zA-Z0-9가-힣]/g,'_');
+  var pel=document.getElementById('sp'+sid);if(pel)pel.textContent=pct+'%';
+  var row=input.closest('.subj-row');var chk=row.querySelector('.s-check');
+  if(val>=target&&target>0){chk.classList.add('on');chk.textContent='✓';}else{chk.classList.remove('on');chk.textContent='';}
+  var p=PLAN[key];
+  if(p){var tot=p.subjects.reduce(function(a,b){return a+(b.target||0);},0);var dn=p.subjects.reduce(function(a,b){return a+Math.min(b.target||0,getProg(key,b.name));},0);var dp=tot>0?Math.round(dn/tot*100):0;var sk=key.replace(/-/g,'');
+    var ptEl=document.getElementById('pt'+sk);var pbEl=document.getElementById('pb'+sk);var pdEl=document.getElementById('pd'+sk);
+    if(ptEl){ptEl.textContent=dp+'%';ptEl.style.color=dp>=100?'var(--green)':dp>=50?'var(--accent)':'var(--text2)';}
+    if(pbEl)pbEl.style.width=Math.min(100,dp)+'%';if(pdEl)pdEl.textContent=dn+'문항 완료';}
+  renderCal();updateOverall();
+}
+function updateOverall(){var total=0,done=0;Object.keys(PLAN).forEach(function(key){var p=PLAN[key];if(p.type!=='study'&&p.type!=='review')return;p.subjects.forEach(function(s){total+=s.target||0;done+=Math.min(s.target||0,getProg(key,s.name));});});var pct=total>0?Math.round(done/total*100):0;document.getElementById('overallBar').style.width=pct+'%';document.getElementById('overallDone').textContent=done.toLocaleString()+'문항 완료';document.getElementById('overallPct').textContent=pct+'%';}
+function formatKo(key){var d=new Date(key+'T00:00:00');var days=['일','월','화','수','목','금','토'];return(d.getMonth()+1)+'월 '+d.getDate()+'일 ('+days[d.getDay()]+')';}
+</script>
+</body>
+</html>
